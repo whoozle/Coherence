@@ -132,8 +132,8 @@ class ControlPoint(log.Loggable):
 
     def check_device(self, device):
         if device.client == None:
-            self.info("found device %s of type %s - %r", device.get_friendly_name(),
-                                                device.get_device_type(), device.client)
+            self.info("found device %s of type %s %s - %r", device.get_friendly_name(),
+                                                device.get_device_type(), device.get_friendly_device_type(), device.client)
             short_type = device.get_friendly_device_type()
             if short_type in self.auto_client and short_type is not None:
                 self.info("identified %s %r",
