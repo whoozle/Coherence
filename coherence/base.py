@@ -640,18 +640,19 @@ class Coherence(log.Loggable):
         return [d for d in self.devices if d.manifestation == 'remote']
 
     def create_device(self, device_type, infos):
-        self.info("creating  %s %s", infos['ST'], infos['USN'])
-        if infos['ST'] == 'upnp:rootdevice':
+        st = infos['ST']
+        self.info("creating  %s %s", st, infos['USN'])
+        if st == 'upnp:rootdevice' or st == 'urn:rvualliance-org:device:RVUServer:1':
             self.info("creating upnp:rootdevice  %s", infos['USN'])
             root = RootDevice(infos)
         else:
             self.info("creating device/service  %s", infos['USN'])
-            root_id = infos['USN'][:-len(infos['ST']) - 2]
+            root_id = infos['USN'][:-len(st) - 2]
             root = self.get_device_with_id(root_id)
             device = Device(infos, root)
         # fire this only after the device detection is fully completed
         # and we are on the device level already, so we can work with them instead with the SSDP announce
-        #if infos['ST'] == 'upnp:rootdevice':
+        # if st == 'upnp:rootdevice' or st == 'urn:rvualliance-org:device:RVUServer:1':
         #    self.callback("new_device", infos['ST'], infos)
 
     def add_device(self, device):
@@ -659,15 +660,16 @@ class Coherence(log.Loggable):
         self.devices.append(device)
 
     def remove_device(self, device_type, infos):
-        self.info("removed device %s %s", infos['ST'], infos['USN'])
+        st = infos['ST']
+        self.info("removed device %s %s", st, infos['USN'])
         device = self.get_device_with_usn(infos['USN'])
         if device:
             louie.send('Coherence.UPnP.Device.removed', None, usn=infos['USN'])
             self.devices.remove(device)
             device.remove()
-            if infos['ST'] == 'upnp:rootdevice':
+            if st == 'upnp:rootdevice' or st == 'urn:rvualliance-org:device:RVUServer:1':
                 louie.send('Coherence.UPnP.RootDevice.removed', None, usn=infos['USN'])
-                self.callback("removed_device", infos['ST'], infos['USN'])
+                self.callback("removed_device", st, infos['USN'])
 
     def add_web_resource(self, name, sub):
         self.children[name] = sub

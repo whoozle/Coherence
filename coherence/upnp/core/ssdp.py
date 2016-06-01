@@ -134,14 +134,14 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         if manifestation == 'local':
             self.doNotify(usn)
 
-        if st == 'upnp:rootdevice':
+        if st == 'upnp:rootdevice' or st == 'urn:rvualliance-org:device:RVUServer:1':
             louie.send('Coherence.UPnP.SSDP.new_device', None, device_type=st, infos=self.known[usn])
             #self.callback("new_device", st, self.known[usn])
 
     def unRegister(self, usn):
         self.msg("Un-registering %s", usn)
         st = self.known[usn]['ST']
-        if st == 'upnp:rootdevice':
+        if st == 'upnp:rootdevice' or st == 'urn:rvualliance-org:device:RVUServer:1':
             louie.send('Coherence.UPnP.SSDP.removed_device', None, device_type=st, infos=self.known[usn])
             #self.callback("removed_device", st, self.known[usn])
 
@@ -289,7 +289,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 self.debug("Checking if %r is still valid - last seen %d (+%d), now %d", self.known[usn]['USN'], last_seen, expiry, now)
                 if last_seen + expiry + 30 < now:
                     self.debug("Expiring: %r", self.known[usn])
-                    if self.known[usn]['ST'] == 'upnp:rootdevice':
+                    if self.known[usn]['ST'] == 'upnp:rootdevice' or self.known[usn]['ST'] == 'urn:rvualliance-org:device:RVUServer:1':
                         louie.send('Coherence.UPnP.SSDP.removed_device', None, device_type=self.known[usn]['ST'], infos=self.known[usn])
                     removable.append(usn)
         while len(removable) > 0:
