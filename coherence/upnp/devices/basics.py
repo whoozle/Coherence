@@ -148,6 +148,8 @@ class RootDeviceXML(static.Data):
 
         if len(devices):
             e = ET.SubElement(d, 'deviceList')
+            for device in devices:
+                e.append(ET.XML(device.xml))
 
         if len(icons):
             e = ET.SubElement(d, 'iconList')
